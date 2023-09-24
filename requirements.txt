@@ -1,0 +1,11 @@
+requests
+pandas
+dash
+dash-bootstrap-components
+dash-core-components
+dash-cytoscape
+dash-html-components
+dash-table
+numpy
+plotly
+tqdm
