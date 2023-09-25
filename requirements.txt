@@ -6,6 +6,9 @@ dash-core-components
 dash-cytoscape
 dash-html-components
 dash-table
+diskcache
+multiprocess
+psutil
 numpy
 plotly
 tqdm
