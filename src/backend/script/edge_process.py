@@ -3,6 +3,11 @@ import pandas as pd
 
 
 if __name__ == "__main__":
+    df = pd.read_csv("../../../data/temp_data/edge_multiply_raw.csv")
+    for i in tqdm.tqdm(range(len(df))):
+        df.loc[i, ["start_station_name"]] = df.loc[i]["start_station_name"].replace(" ", "")
+        df.loc[i, ["end_station_name"]] = df.loc[i]["end_station_name"].replace(" ", "")
+    df.to_csv("../../../data/temp_data/edge_multiply.csv", index=False)
     df = pd.read_csv("../../../data/temp_data/edge_multiply.csv")
     edge_set = set()
     edge_list = []
