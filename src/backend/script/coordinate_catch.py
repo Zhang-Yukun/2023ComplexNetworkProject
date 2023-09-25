@@ -6,7 +6,7 @@ import pandas as pd
 
 
 if __name__ == "__main__":
-    station_city_df = pd.read_csv("../../../data/station_city.csv")
+    station_city_df = pd.read_csv("../../../data/temp_data/station_city.csv")
     station_coordinate_list = []
     missing_station_coordinate_list = []
     url = "http://api.map.baidu.com/geocoding/v3/"

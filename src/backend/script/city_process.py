@@ -5,7 +5,7 @@ import pandas as pd
 if __name__ == "__main__":
     station_df = pd.read_csv("../../../data/node.csv")
     station_list = station_df.to_dict(orient='list')['node']
-    station_city_df = pd.read_csv("../../../data/station_city_raw.csv")
+    station_city_df = pd.read_csv("../../../data/temp_data/station_city_raw.csv")
     del_rows = []
     for i in range(len(station_city_df)):
         if station_city_df.loc[i]["station"] not in station_list:

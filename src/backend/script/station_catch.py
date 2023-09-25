@@ -21,7 +21,7 @@ def time_minus(start_time, end_time):
 
 
 if __name__ == "__main__":
-    df = pd.read_csv("../../../data/station_train_code.csv")
+    df = pd.read_csv("../../../data/temp_data/station_train_code.csv")
     station_train_code_dict = df.to_dict(orient="index")
 
     date_list = ["2023-09-25", "2023-09-26", "2023-09-27", "2023-09-28", "2023-09-29", "2023-09-30",
