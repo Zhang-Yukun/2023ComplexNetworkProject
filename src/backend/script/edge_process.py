@@ -3,7 +3,7 @@ import pandas as pd
 
 
 if __name__ == "__main__":
-    df = pd.read_csv("../../../data/edge_multiply.csv")
+    df = pd.read_csv("../../../data/temp_data/edge_multiply.csv")
     edge_set = set()
     edge_list = []
     df = df.sort_values(by="running_time")
