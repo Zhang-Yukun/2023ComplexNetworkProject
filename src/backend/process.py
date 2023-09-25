@@ -38,6 +38,6 @@ def generate_novel_graph(label):
     process_csv("backend/data/parsed/{}/{}.csv".format(label, label), label)
 
 current_path = os.path.dirname(__file__)
-paths = current_path+ "/data/parsed/rail/rail.csv"
+filenames = current_path+ "/data/parsed/rail/rail.csv"
 label = "rail"
-process_csv(paths, label)
+process_csv(filenames, label)

@@ -28,9 +28,9 @@ def generate_random_graph(size):
 def load_graph(clz, label):
     sys.setrecursionlimit(3000)
     g = clz()
-    if path.exists("backend/model/cache/{}.pkl".format(label)):
+    if path.exists("src/backend/model/cache/{}.pkl".format(label)):
         print('load graph {} from disk...'.format(label))
-        return pickle.load(open("backend/model/cache/{}.pkl".format(label), 'rb'))
+        return pickle.load(open("src/backend/model/cache/{}.pkl".format(label), 'rb'))
     # if not path.exists('backend/data/parsed/{}/names.txt'.format(label)):
     #     generate_novel_graph(label)
     with open(current_path+ '/data/parsed/{}/names.txt'.format(label), 'r',encoding='utf8') as f:
@@ -47,9 +47,9 @@ def load_graph(clz, label):
     g.calc_coreness()
     g.calc_cluster_coefficient()
     print('calculation properties for graph {} done'.format(label))
-    if not os.path.exists("backend/model/cache/"):
-        os.makedirs("backend/model/cache/")
-    pickle.dump(g, open("backend/model/cache/{}.pkl".format(label), "wb"))
+    if not os.path.exists("src/backend/model/cache/"):
+        os.makedirs("src/backend/model/cache/")
+    pickle.dump(g, open("src/backend/model/cache/{}.pkl".format(label), "wb"))
     return g
 
 
