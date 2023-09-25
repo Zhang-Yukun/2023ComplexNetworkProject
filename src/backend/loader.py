@@ -3,6 +3,7 @@ import pickle
 import random
 import sys
 from os import path
+import pandas as pd
 
 from src.backend.model.graph import Graph
 from src.backend.process import generate_novel_graph
@@ -28,107 +29,41 @@ def generate_random_graph(size):
 def load_graph(clz, label):
     sys.setrecursionlimit(3000)
     g = clz()
-    if path.exists("src/backend/model/cache/{}.pkl".format(label)):
+    if path.exists("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/cache/{}.pkl".format(label)):
         print('load graph {} from disk...'.format(label))
-        return pickle.load(open("src/backend/model/cache/{}.pkl".format(label), 'rb'))
+        return pickle.load(open("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/cache/{}.pkl".format(label), 'rb'))
     # if not path.exists('backend/data/parsed/{}/names.txt'.format(label)):
     #     generate_novel_graph(label)
-    with open(current_path+ '/data/parsed/{}/names.txt'.format(label), 'r',encoding='utf8') as f:
-        for x in f.readlines():
-            g.add_node(x.strip(), x.strip())
-    with open(current_path+'/data/parsed/{}/edges.txt'.format(label), 'r',encoding='utf8') as f:
-        for ed in f.readlines():
-            ed = ed.split(";")
-            n1 = ed[0].strip()
-            n2 = ed[1].strip()
-            g.add_edge(n1, n2, float(ed[2].strip()))
-    print('calculating properties for graph {}'.format(label))
+    df = pd.read_csv("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/node.csv")
+    for index, row in df.iterrows():
+        g.add_node(row["node"], row["node"])
+    df = pd.read_csv("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/edge_simple.csv")
+    for index, row in df.iterrows():
+        g.add_edge(row["start_station_name"], row["end_station_name"], float(row["running_time"]))
+    # with open(current_path+ '/data/parsed/{}/names.txt'.format(label), 'r',encoding='utf8') as f:
+    #     for x in f.readlines():
+    #         g.add_node(x.strip(), x.strip())
+    # with open(current_path+'/data/parsed/{}/edges.txt'.format(label), 'r',encoding='utf8') as f:
+    #     for ed in f.readlines():
+    #         ed = ed.split(";")
+    #         n1 = ed[0].strip()
+    #         n2 = ed[1].strip()
+    #         g.add_edge(n1, n2, float(ed[2].strip()))
+    print('calculating properties for {}'.format(label))
     g.calc_dists()
     g.calc_coreness()
     g.calc_cluster_coefficient()
-    print('calculation properties for graph {} done'.format(label))
-    if not os.path.exists("src/backend/model/cache/"):
-        os.makedirs("src/backend/model/cache/")
-    pickle.dump(g, open("src/backend/model/cache/{}.pkl".format(label), "wb"))
+    print('calculation properties for {} done'.format(label))
+    if not os.path.exists("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/cache/"):
+        os.makedirs("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/cache/")
+    pickle.dump(g, open("/Applications/LANGUAGE/PYTHON/2023ComplexNetworkProject/data/cache/{}.pkl".format(label), "wb"))
     return g
-
-
-class RedGraph(Graph):
-    # def get_node_color_map(self):
-    #     map = super().get_node_color_map()
-    #     map['贾'] = "#26A7FF"
-    #     map['史'] = "#3abc98"
-    #     map['林'] = "#EC4A94"
-    #     map['王'] = "#ECAD00"
-    #     map['靴'] = "#F0AA34"
-    #     return map
-
-    def get_node_class(self, node):
-        return node.label[0]
-
-
-class KingdomGraph(Graph):
-    def __init__(self):
-        super().__init__()
-        self.country_map = {}
-        with open('backend/data/parsed/kingdom/countries/qun.txt', 'r') as f:
-            for name in f.readlines():
-                self.country_map[name.strip()] = 'qun'
-        with open('backend/data/parsed/kingdom/countries/wei.txt', 'r') as f:
-            for name in f.readlines():
-                self.country_map[name.strip()] = 'wei'
-        with open('backend/data/parsed/kingdom/countries/shu.txt', 'r') as f:
-            for name in f.readlines():
-                self.country_map[name.strip()] = 'shu'
-        with open('backend/data/parsed/kingdom/countries/wu.txt', 'r') as f:
-            for name in f.readlines():
-                self.country_map[name.strip()] = 'wu'
-
-    # def get_node_color_map(self):
-    #     return {
-    #         'wei': "#097AFF",
-    #         "shu": "#FD9A28",
-    #         "wu": "#3abc98",
-    #         "qun": "#C1CBCA"
-    #     }
-
-    def get_node_class(self, node):
-        if node.label in self.country_map.keys():
-            return self.country_map[node.label]
-        else:
-            return 'qun'
-
-
-class WestGraph(Graph):
-    def get_node_class(self, node):
-        return node.label[0]
-
-
-class WhoGraph(Graph):
-    def get_node_class(self, node):
-        return node.label[0]
 
 class RailGraph(Graph):
     def get_node_class(self, node):
         return node.label[0]
-
-def load_kingdom_graph():
-    return load_graph(KingdomGraph, "kingdom")
-
-
-def load_red_graph():
-    return load_graph(RedGraph, "red")
-
-
-def load_west_graph():
-    return load_graph(WestGraph, "west")
-
-
-def load_who_graph() -> object:
-    return load_graph(WhoGraph, "who")
-
 def load_rail_graph() -> object:
-    return load_graph(RailGraph, "rail")
+    return load_graph(RailGraph, "graph")
 
 def load_any_graph(key) -> object:
     return load_graph(Graph, key)

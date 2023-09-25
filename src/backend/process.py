@@ -37,7 +37,7 @@ def generate_novel_graph(label):
     parse_novel(label)
     process_csv("backend/data/parsed/{}/{}.csv".format(label, label), label)
 
-current_path = os.path.dirname(__file__)
-filenames = current_path+ "/data/parsed/rail/rail.csv"
-label = "rail"
-process_csv(filenames, label)
+# current_path = os.path.dirname(__file__)
+# paths = current_path+ "/data/parsed/rail/rail.csv"
+# label = "rail"
+# process_csv(paths, label)
