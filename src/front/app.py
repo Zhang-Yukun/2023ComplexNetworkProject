@@ -89,7 +89,7 @@ panel = dbc.Card(
         html.Br(),
         dcc.Upload([
             '拖拽或',
-            html.A('选择小说txt文件')
+            html.A('选择文件')
         ], style={
             'width': '100%',
             'height': '60px',
