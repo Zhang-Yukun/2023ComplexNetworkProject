@@ -66,4 +66,4 @@ if __name__ == "__main__":
     df = pd.DataFrame(node_list, columns=["node"])
     df.to_csv("../../../data/node_raw.csv", index=False)
     df = pd.DataFrame(edge_list)
-    df.to_csv("../../../data/edge_multiply.csv", index=False)
+    df.to_csv("../../../data/edge_multiply_raw.csv", index=False)
