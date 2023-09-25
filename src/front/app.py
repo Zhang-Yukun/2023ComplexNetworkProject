@@ -461,10 +461,10 @@ def display_hover_node(data):
     ], manager=background_callback_manager)
 def add_graph(a):
     key = viewModel.upload_key
-    dir = utils.config.raw_path + viewModel.upload_key + "/"
+    dir = src.utils.config.raw_path + viewModel.upload_key + "/"
     if not os.path.exists(dir):
         os.makedirs(dir)
-    with open(utils.config.raw_path + "{}/{}.txt".format(viewModel.upload_key, viewModel.upload_key), "w+") as f:
+    with open(src.utils.config.raw_path + "{}/{}.txt".format(viewModel.upload_key, viewModel.upload_key), "w+") as f:
         f.write(viewModel.upload_content)
     if os.path.exists('backend/model/cache/{}.pkl'.format(key)):
         os.remove('backend/model/cache/{}.pkl'.format(key))
