@@ -14,7 +14,6 @@ import plotly.graph_objects as go
 from dash.long_callback import DiskcacheManager
 
 import src.utils.config
-from src.backend.process import generate_novel_graph
 from src.front.adapter import graph_to_view
 from src.front.view_model import ViewModel
 
@@ -463,32 +462,32 @@ def display_hover_node(data):
     return False, []
 
 
-@app.callback(
-    Output("upload-label", "children"),
-    Output("window-dropdown", "options"),
-    Output("window-dropdown", "value"),
-    Input('add_graph', 'n_clicks'),
-    background =True,
-    prevent_initial_call=True,
-    running=[
-        (Output("add_graph", "disabled"), True, False),
-        (Output("loading-output", "children"), "导入并建模中...需要点时间", "导入完成"),
-    ], manager=background_callback_manager)
-def add_graph(a):
-    key = viewModel.upload_key
-    dir = src.utils.config.raw_path + viewModel.upload_key + "/"
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    with open(src.utils.config.raw_path + "{}/{}.txt".format(viewModel.upload_key, viewModel.upload_key), "w+") as f:
-        f.write(viewModel.upload_content)
-    if os.path.exists('backend/model/cache/{}.pkl'.format(key)):
-        os.remove('backend/model/cache/{}.pkl'.format(key))
-    generate_novel_graph(key)
-    viewModel.add_graph(key)
-    viewModel.upload_content = None
-    viewModel.upload_key = None
-    viewModel.ready_upload = False
-    return "", [{"label": name, "value": value} for name, value in zip(viewModel.names, viewModel.keys)], key
+# @app.callback(
+#     Output("upload-label", "children"),
+#     Output("window-dropdown", "options"),
+#     Output("window-dropdown", "value"),
+#     Input('add_graph', 'n_clicks'),
+#     background =True,
+#     prevent_initial_call=True,
+#     running=[
+#         (Output("add_graph", "disabled"), True, False),
+#         (Output("loading-output", "children"), "导入并建模中...需要点时间", "导入完成"),
+#     ], manager=background_callback_manager)
+# def add_graph(a):
+#     key = viewModel.upload_key
+#     dir = src.utils.config.raw_path + viewModel.upload_key + "/"
+#     if not os.path.exists(dir):
+#         os.makedirs(dir)
+#     with open(src.utils.config.raw_path + "{}/{}.txt".format(viewModel.upload_key, viewModel.upload_key), "w+") as f:
+#         f.write(viewModel.upload_content)
+#     if os.path.exists('backend/model/cache/{}.pkl'.format(key)):
+#         os.remove('backend/model/cache/{}.pkl'.format(key))
+#     generate_novel_graph(key)
+#     viewModel.add_graph(key)
+#     viewModel.upload_content = None
+#     viewModel.upload_key = None
+#     viewModel.ready_upload = False
+#     return "", [{"label": name, "value": value} for name, value in zip(viewModel.names, viewModel.keys)], key
 
 
 @app.callback(

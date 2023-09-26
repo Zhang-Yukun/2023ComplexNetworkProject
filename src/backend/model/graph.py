@@ -1,5 +1,5 @@
 import math
-
+import tqdm
 import numpy as np
 
 from src.backend.model.node import Node
@@ -90,7 +90,7 @@ class Graph:
         计算任意两个节点之间的距离
         """
         dists = {}
-        for n in self.nodes:
+        for n in tqdm.tqdm(self.nodes):
             u = []
             v = [x.id for x in self.nodes]
             dis = {id: math.inf for id in v}
@@ -110,7 +110,7 @@ class Graph:
     def calc_connected_components_num(self):
         visit = []
         num = 0
-        for node in self.nodes:
+        for node in tqdm.tqdm(self.nodes):
             if node.id in visit:
                 continue
             num += 1
@@ -127,7 +127,7 @@ class Graph:
         """
         计算每个节点的聚类系数
         """
-        for node in self.nodes:
+        for node in tqdm.tqdm(self.nodes):
             e = node.get_degree()
             if e == 1 or e == 0:
                 self.cluster_coefficient[node] = e

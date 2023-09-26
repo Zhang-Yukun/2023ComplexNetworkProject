@@ -6,7 +6,7 @@ from src.utils.config import raw_path
 
 class ViewModel:
     def __init__(self):
-        name_map = {"rail":"中国铁路"}
+        name_map = {"rail": "中国铁路"}
         self.keys = ["rail"]
         self.names = ["中国铁路"]
         # name_map = {}
@@ -34,19 +34,7 @@ class ViewModel:
         self.graph_raw = {}
         self.current_graph = None
         for key in self.keys:
-            if key == 'red':
-                self.graph_raw[key] = load_red_graph()
-                self.graphs[key] = load_red_graph()
-            elif key == 'west':
-                self.graph_raw[key] = load_west_graph()
-                self.graphs[key] = load_west_graph()
-            elif key == 'kingdom':
-                self.graph_raw[key] = load_kingdom_graph()
-                self.graphs[key] = load_kingdom_graph()
-            elif key == 'who':
-                self.graph_raw[key] = load_who_graph()
-                self.graphs[key] = load_who_graph()
-            elif key == 'rail':
+            if key == 'rail':
                 self.graph_raw[key] = load_rail_graph()
                 self.graphs[key] = load_rail_graph()
             else:
@@ -69,15 +57,7 @@ class ViewModel:
         if key not in self.graphs.keys():
             self.add_graph(key)
         if reset:
-            if key == 'red':
-                self.graphs[key] = load_red_graph()
-            elif key == 'west':
-                self.graphs[key] = load_west_graph()
-            elif key == 'kingdom':
-                self.graphs[key] = load_kingdom_graph()
-            elif key == 'who':
-                self.graphs[key] = load_who_graph()
-            elif key == 'rail':
+            if key == 'rail':
                 self.graphs[key] = load_rail_graph()
             else:
                 self.graphs[key] = load_any_graph(key)
