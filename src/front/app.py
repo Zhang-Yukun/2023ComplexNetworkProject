@@ -378,6 +378,8 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
         nodes_cate.append(
             dbc.Badge(k, color=v, pill=True, className="me-1", style={"margin": "4 4 4 4"}, text_color="white")
         )
+
+
     return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
         graph.get_average_degree()), "{:.2f}".format(
         graph.get_average_path_length()), "{:.2f}".format(
