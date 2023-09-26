@@ -56,6 +56,20 @@ class Graph:
             self.id2nodes[from_id].neighbours[to_id] = weight
             self.id2nodes[to_id].prevs[from_id] = weight
 
+    def remove_edge(self, ToRemove):
+
+        for nid in ToRemove:
+            if nid in self.nodes:
+                if nid.id in self.edges:
+
+                    names = nid.neighbours.keys()
+                    for item in names:      #删节点的neibour
+                        self.id2nodes[item].prevs.pop(nid.id)  #删neibour节点的prev
+                    self.id2nodes[nid.id].neighbours = {}
+                    self.edges.pop(nid.id)  #删edge
+
+
+
     # 基本参数的计算
     def get_average_degree(self):
         res = 0

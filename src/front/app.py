@@ -157,9 +157,10 @@ view_panel = dbc.Card(
 
 attack_panel = dbc.Card([html.H5("攻击"),
                          html.Br(), dbc.Row(
-        [dbc.Col(dbc.Button('随机攻击', id='random-attack'), width=3),
+        [dbc.Col(dbc.Button('随机攻击节点', id='random-attack'), width=3.5),
+         dbc.Col(dbc.Button('随机攻击边', id='edge-random-attack', color='danger'), width=3.5),
          dbc.Col(dbc.Button('意图攻击', id='intentional-attack', color='warning'), width=3),
-         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0), width=3),
+         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0), width=2),
          dbc.Label('已删除', id='ia-label'),
          ]
     )], body=True)
@@ -282,6 +283,7 @@ def update_label(degree_range):
     Output("random-attack", "disabled"),
     Output("intentional-attack", "disabled"),
     Output("reset", "disabled"),
+    Output("edge-random-attack", "disabled"),
     Input("ia-label", "children"),
     Input("intentional-attack", "n_clicks"),
     Input("ia-cancel", "n_clicks"),
@@ -299,7 +301,7 @@ def intentional_attack(x, a, b, d):
     elif triggered_id == 'ia-cancel':
         viewModel.is_ia = False
         viewModel.ia_selected = []
-    return viewModel.is_ia, viewModel.is_ia, viewModel.is_ia, label
+    return viewModel.is_ia, viewModel.is_ia, viewModel.is_ia, label,viewModel.is_ia
 
 
 @app.callback(
@@ -319,9 +321,10 @@ def intentional_attack(x, a, b, d):
     Input("degree-slider", "value"),
     Input('random-attack', 'n_clicks'),
     Input('ia-delete', 'n_clicks'),
-    Input('reset', 'n_clicks')
+    Input('reset', 'n_clicks'),
+    Input('edge-random-attack', 'n_clicks')
 )
-def update_figure(book, degree_range, random_attack_click, reset_click, ia_label):
+def update_figure(book, degree_range, random_attack_click, reset_click, ia_label,edge_attack):
     triggered_id = ctx.triggered_id
     graph = viewModel.get_graph(book, triggered_id == 'reset')
     if triggered_id == 'random-attack':
@@ -330,6 +333,16 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
         # graph.calc_cluster_coefficient()
         # graph.calc_coreness()
         graph.calc_connected_components_num()
+
+    if triggered_id == 'edge-random-attack':
+        nodes = random.sample(graph.nodes, int(len(graph.nodes) * 0.3))
+        graph.remove_edge(nodes)
+        graph.calc_connected_components_num()
+        graph.calc_cluster_coefficient()
+        graph.calc_coreness()
+        graph.calc_connected_components_num()
+
+
     if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
         graph.remove_nodes(viewModel.ia_selected)
         viewModel.ia_selected = []
