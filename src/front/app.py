@@ -131,6 +131,7 @@ view_panel = dbc.Card(
                 {"label": "宽度", "value": "breadthfirst"},
                 # {"label": "随机", "value": "random"},
                 {"label": "网格", "value": "grid"},
+                {"label": "地图", "value": "preset"}
             ],
             labelStyle={
                 "display": "inline-block",
@@ -223,8 +224,8 @@ app.layout = dbc.Container(
             ]
         ),
         dbc.Col([
-            dbc.Row([dbc.Col(dcc.Graph(id='popular_nodes'))
-                        , dbc.Col(dcc.Graph(id='coreness_nodes'))
+            dbc.Row([dbc.Col(dcc.Graph(id='popular_nodes')),
+                     dbc.Col(dcc.Graph(id='coreness_nodes'))
                      ]),
             dbc.Row([dbc.Col(dcc.Graph(id='degree_distribution')),dbc.Col(dcc.Graph(id='cluster_nodes'))]),
         ]),
@@ -241,35 +242,6 @@ app.layout = dbc.Container(
     ],
     fluid=True,
 )
-
-
-# app.layout = html.Div(
-#     className="page",
-#     children=[
-#         html.Div(
-#             className="sub_page",
-#             children=[
-#                 # html.Div(className='col-2'),
-#                 html.Div(
-#                     children=[
-#                         html.H3(
-#                             className="product",
-#                             children=[
-#                                 "名著人物关系图"
-#                             ],
-#                         ),
-#                         panel,
-#                         dbc.Row(
-#                             [dbc.Col(card) for card in cards]
-#                         ),
-#                         charts
-#                     ]
-#                 ),
-#             ],
-#         )
-#     ],
-# )
-
 
 @app.callback(
     Output("degree-slider-label", "children"),
@@ -329,6 +301,7 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
     graph = viewModel.get_graph(book, triggered_id == 'reset')
     if triggered_id == 'random-attack':
         nodes = random.sample(graph.nodes, int(len(graph.nodes) * 0.3))
+        print("====-----====")
         graph.remove_nodes([node.id for node in nodes])
         graph.calc_cluster_coefficient()
         graph.calc_coreness()
@@ -456,7 +429,7 @@ def display_hover_node(data):
     if data:
         node_id = data['id']
         graph = viewModel.current_graph
-        node = graph.id2nodes[node_id]
+        node = graph.id_to_node[node_id]
         content = [
             dbc.ListGroupItem([html.Label("{}".format(data['label']), style={"color": "white"})],
                               color=graph.get_node_color_map()[data['class_name']]),
