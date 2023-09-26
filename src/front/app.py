@@ -28,6 +28,8 @@ cache = diskcache.Cache("./cache")
 background_callback_manager = DiskcacheManager(cache)
 
 app = Dash(__name__, external_stylesheets=external_stylesheets)
+
+
 viewModel = ViewModel()
 cards = [
     dbc.Card(
@@ -86,29 +88,29 @@ panel = dbc.Card(
             style={"padding": "20 20 20 20"}
         ),
         html.Br(),
-        dcc.Upload([
-            '拖拽或',
-            html.A('选择文件')
-        ], style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center'
-        }, id='upload', multiple=False),
-        html.Div(id="upload-result"),
-        dbc.Spinner(html.Div(id="loading-output"), color="primary"),
-        dbc.Collapse(
-            dbc.Row(
-                [dbc.Col(dbc.Button('进行分析', id='add_graph', color='primary'), width=3),
-                 dbc.Col(dbc.Button('取消', id='upload_cancel', color='light'), width=3),
-                 ]
-            ), id="upload-buttons", is_open=False
-        ),
-        dbc.Label('', id='upload-label')
-        ,
+        # dcc.Upload([
+        #     '拖拽或',
+        #     html.A('选择文件')
+        # ], style={
+        #     'width': '100%',
+        #     'height': '60px',
+        #     'lineHeight': '60px',
+        #     'borderWidth': '1px',
+        #     'borderStyle': 'dashed',
+        #     'borderRadius': '5px',
+        #     'textAlign': 'center'
+        # }, id='upload', multiple=False),
+        # html.Div(id="upload-result"),
+        # dbc.Spinner(html.Div(id="loading-output"), color="primary"),
+        # dbc.Collapse(
+        #     dbc.Row(
+        #         [dbc.Col(dbc.Button('进行分析', id='add_graph', color='primary'), width=3),
+        #          dbc.Col(dbc.Button('取消', id='upload_cancel', color='light'), width=3),
+        #          ]
+        #     ), id="upload-buttons", is_open=False
+        # ),
+        # dbc.Label('', id='upload-label')
+        # ,
 
     ], body=True
 )
@@ -158,34 +160,34 @@ attack_panel = dbc.Card([html.H5("攻击"),
                          html.Br(), dbc.Row(
         [dbc.Col(dbc.Button('随机攻击节点', id='random-attack'), width=3.5),
          dbc.Col(dbc.Button('随机攻击边', id='edge-random-attack', color='danger'), width=3.5),
-         dbc.Col(dbc.Button('意图攻击', id='intentional-attack', color='warning'), width=3),
-         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0), width=2),
+         dbc.Col(dbc.Button('意图攻击', id='intentional-attack', color='warning'), width=3.5),
+         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0), width=3.5),
          dbc.Label('已删除', id='ia-label'),
          ]
     )], body=True)
 
-categories_panel = dbc.Card([html.H5("结点类别"),
-                             html.Br(), html.Span(id='nodes_category')], body=True)
-
 
 def Header(name, app):
-    title = html.H1(name, style={"margin-top": 5})
-    logo = html.Img(
-        src=app.get_asset_url("dash-logo.png"), style={"float": "right", "height": 60}
-    )
-    link = html.A(logo, href="https://plotly.com/dash/")
+    title = html.H1(name, style={"margin-top": 3, "text-align": "center","color": "teal",  # 设置字体颜色
+    "font-weight": "bold",  # 设置字体粗细
+    "font-family": "Arial, sans-serif"  })
+    # logo = html.Img(
+    #     src=app.get_asset_url("dash-logo.png"), style={"float": "right", "height": 60}
+    # )
+    # link = html.A(logo, href="https://plotly.com/dash/")
 
-    return dbc.Row([dbc.Col(title, md=8), dbc.Col(link, md=4)])
+    return dbc.Row([dbc.Col(title, md=12)])
 
 
 app.layout = dbc.Container(
-    [
+
+    children= [
         Header("中国铁路公交网络", app),
         html.Hr(),
         dbc.Row(
             [
                 dbc.Col(
-                    [panel, view_panel, attack_panel, categories_panel], width=3,
+                    [panel, view_panel, attack_panel], width=3,
                 ),
                 dbc.Col([
                     dbc.Row(
@@ -310,7 +312,6 @@ def intentional_attack(x, a, b, d):
     Output("avg_path_len", "children"),
     Output("cluster_co", "children"),
     Output("coreness", "children"),
-    Output("nodes_category", "children"),
     Output("popular_nodes", "figure"),
     Output("coreness_nodes", "figure"),
     Output("degree_distribution", "figure"),
@@ -329,9 +330,11 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
     if triggered_id == 'random-attack':
         nodes = random.sample(graph.nodes, int(len(graph.nodes) * 0.3))
         graph.remove_nodes([node.id for node in nodes])
-        # graph.calc_cluster_coefficient()
-        # graph.calc_coreness()
+        graph.calc_cluster_coefficient()
+        graph.calc_coreness()
+        graph.calc_dists()
         graph.calc_connected_components_num()
+
 
     if triggered_id == 'edge-random-attack':
         nodes = random.sample(graph.nodes, int(len(graph.nodes) * 0.3))
@@ -339,7 +342,6 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
         graph.calc_connected_components_num()
         graph.calc_cluster_coefficient()
         graph.calc_coreness()
-        graph.calc_connected_components_num()
 
 
     if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
@@ -347,12 +349,12 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
         viewModel.ia_selected = []
         viewModel.is_ia = False
         graph.calc_connected_components_num()
-        # graph.calc_cluster_coefficient()
-        # graph.calc_coreness()
+        graph.calc_cluster_coefficient()
+        graph.calc_coreness()
     ss, e = graph_to_view(graph, degree_range)
     cn = graph.get_low_cluster_nodes()
     cluster = go.Figure(
-        data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn])],
+        data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
         layout_title_text="聚类系数"
     )
     dd = graph.get_degree_distribution()
@@ -362,13 +364,13 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
     )
     pn = graph.get_popular_nodes()
     popular = go.Figure(
-        data=[go.Bar(x=[n.id for n, _ in pn], y=[degree for _, degree in pn])],
+        data=[go.Bar(x=[n.id for n, _ in pn], y=[degree for _, degree in pn], marker={'color': '#03fc24'})],
         layout_title_text="结点度数"
     )
 
     con = graph.get_high_coreness_nodes()
     coreness = go.Figure(
-        data=[go.Bar(x=[n.id for n, _ in con], y=[degree for _, degree in con])],
+        data=[go.Bar(x=[n.id for n, _ in con], y=[degree for _, degree in con],marker={'color': '#a103fc'})],
         layout_title_text="Coreness"
     )
 
@@ -379,11 +381,17 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
         )
 
 
+    # return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
+    #     graph.get_average_degree()), "{:.2f}".format(
+    #     graph.get_average_path_length()), "{:.2f}".format(
+    #     graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
+    #        nodes_cate, popular, coreness, degree_dis,cluster, ""
+
     return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
         graph.get_average_degree()), "{:.2f}".format(
         graph.get_average_path_length()), "{:.2f}".format(
         graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-           nodes_cate, popular, coreness, degree_dis,cluster, ""
+        popular, coreness, degree_dis, cluster, ""
 
 
 @app.callback(
