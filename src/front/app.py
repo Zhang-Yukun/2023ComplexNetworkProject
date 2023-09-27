@@ -355,7 +355,7 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
     ss, e, present_node_num, present_edge_num = graph_to_view(graph, degree_range, coreness_input)
     cn = graph.get_low_cluster_nodes()
     cluster = go.Figure(
-        data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
+        data=[go.Bar(x=[n.name for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
         layout_title_text="聚类系数"
     )
     dd = graph.get_degree_distribution()
@@ -365,13 +365,13 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
     )
     pn = graph.get_popular_nodes()
     popular = go.Figure(
-        data=[go.Bar(x=[n.id for n, _ in pn], y=[degree for _, degree in pn], marker={'color': '#03fc24'})],
+        data=[go.Bar(x=[n.name for n, _ in pn], y=[degree for _, degree in pn], marker={'color': '#004d00'})],
         layout_title_text="结点度数"
     )
 
     con = graph.get_high_coreness_nodes()
     coreness = go.Figure(
-        data=[go.Bar(x=[n.id for n, _ in con], y=[degree for _, degree in con],marker={'color': '#a103fc'})],
+        data=[go.Bar(x=[n.name for n, _ in con], y=[degree for _, degree in con],marker={'color': '#a103fc'})],
         layout_title_text="Coreness"
     )
 
@@ -380,8 +380,7 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
         nodes_cate.append(
             dbc.Badge(k, color=v, pill=True, className="me-1", style={"margin": "4 4 4 4"}, text_color="white")
         )
-    total_node =len(graph.nodes)
-    total_edge =len(graph.edges)
+
     diameter = graph.diameter
     # return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
     #     graph.get_average_degree()), "{:.2f}".format(
@@ -542,3 +541,86 @@ def parse_contents(contents, filename):
             'wordBreak': 'break-all'
         })
     ])
+
+# @app.callback(
+#     Output("cytoscape", "elements"),
+#     Output("connected_component_num", "children"),
+#     Output("avg_degree", "children"),
+#     Output("avg_path_len", "children"),
+#     Output("cluster_co", "children"),
+#     Output("coreness", "children"),
+#     Output("popular_nodes", "figure"),
+#     Output("coreness_nodes", "figure"),
+#     Output("degree_distribution", "figure"),
+#     Output("cluster_nodes", "figure"),
+#     Output('ia-label', 'children'),
+#     Output("total_node", "children"),
+#     Output("total_edge", "children"),
+#     Output("diameter", "children"),
+#
+#     Input("window-dropdown", "value"),
+#     # Input("degree-slider", "value"),
+#     # Input("coreness-input", "value"),
+#     Input("if_only_show_connected"),
+#     Input('reset', 'n_clicks'),
+#
+# )
+# def show_connected_cluster(book, degree_range, coreness_input, random_attack_click, reset_click, ia_label,edge_attack):
+#     triggered_id = ctx.triggered_id
+#     graph = viewModel.get_graph(book, triggered_id == 'reset')
+#     if triggered_id == 'random-attack':
+#         nodes = random.sample(list(graph.nodes), int(len(graph.nodes) * 0.3))
+#         graph.remove_nodes([node.id for node in nodes])
+#     if triggered_id == 'edge-random-attack':
+#         edges = random.sample(list(graph.edges.keys()), int(len(graph.edges) * 0.3))
+#         graph.remove_edges([edge for edge in edges])
+#     if triggered_id == "intentional-attack":
+#         nodes_dict = dict(sorted(graph.degrees.items(), key=itemgetter(1), reverse=True))
+#         nodes = list(nodes_dict.keys())[:int(len(graph.nodes) * 0.3)]
+#         graph.remove_nodes([node.id for node in nodes])
+#     if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
+#         graph.remove_nodes(viewModel.ia_selected)
+#         viewModel.ia_selected = []
+#         viewModel.is_ia = False
+#     ss, e, present_node_num, present_edge_num = graph_to_view(graph, degree_range, coreness_input)
+#     cn = graph.get_low_cluster_nodes()
+#     cluster = go.Figure(
+#         data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
+#         layout_title_text="聚类系数"
+#     )
+#     dd = graph.get_degree_distribution()
+#     degree_dis = go.Figure(
+#         data=[go.Bar(x=list(dd.keys()), y=list(dd.values()))],
+#         layout_title_text="度数分布"
+#     )
+#     pn = graph.get_popular_nodes()
+#     popular = go.Figure(
+#         data=[go.Bar(x=[n.id for n, _ in pn], y=[degree for _, degree in pn], marker={'color': '#03fc24'})],
+#         layout_title_text="结点度数"
+#     )
+#
+#     con = graph.get_high_coreness_nodes()
+#     coreness = go.Figure(
+#         data=[go.Bar(x=[n.id for n, _ in con], y=[degree for _, degree in con],marker={'color': '#a103fc'})],
+#         layout_title_text="Coreness"
+#     )
+#
+#     nodes_cate = []
+#     for k, v in graph.get_node_color_map().items():
+#         nodes_cate.append(
+#             dbc.Badge(k, color=v, pill=True, className="me-1", style={"margin": "4 4 4 4"}, text_color="white")
+#         )
+#     total_node =len(graph.nodes)
+#     total_edge =len(graph.edges)
+#     diameter = graph.diameter
+#     # return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
+#     #     graph.get_average_degree()), "{:.2f}".format(
+#     #     graph.get_average_path_length()), "{:.2f}".format(
+#     #     graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
+#     #        nodes_cate, popular, coreness, degree_dis,cluster, ""
+#
+#     return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
+#         graph.get_average_degree()), "{:.2f}".format(
+#         graph.get_average_path_length()), "{:.2f}".format(
+#         graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
+#         popular, coreness, degree_dis, cluster, "", present_node_num,present_edge_num,diameter
