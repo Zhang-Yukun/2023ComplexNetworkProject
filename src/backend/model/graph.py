@@ -39,6 +39,7 @@ class Graph:
             for neighbour_id in node.get_all_neighbours_id():
                 neighbour = self.id_to_node[neighbour_id]
                 neighbour.remove_neighbour(index)
+                self.degrees[neighbour] -= 1
             delete_list = [pair for pair in self.edges.keys() if index in pair]
             for pair in delete_list:
                 self.edges.pop(pair)
@@ -47,7 +48,6 @@ class Graph:
             self.degrees.pop(node)
             self.nodes.remove(node)
             self.size -= 1
-        self.calculate_all_properties()
 
     def add_edge(self, source_id, target_id, weight=0.0):
         if source_id == target_id:
@@ -71,7 +71,6 @@ class Graph:
             target_node = self.id_to_node[edge[1]]
             source_node.neighbours.pop(edge[1])
             target_node.neighbours.pop(edge[0])
-        self.calculate_all_properties()
 
     # 基本参数的计算
     def calculate_all_properties(self):

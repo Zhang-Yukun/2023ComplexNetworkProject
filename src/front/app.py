@@ -108,36 +108,12 @@ panel = dbc.Card(
             id="window-dropdown",
             options=[
                 {"label": name, "value": value} for name, value in zip(viewModel.names, viewModel.keys)
-
             ],
             value="rail",
             clearable=False,
             style={"padding": "20 20 20 20"}
         ),
         html.Br(),
-        # dcc.Upload([
-        #     '拖拽或',
-        #     html.A('选择文件')
-        # ], style={
-        #     'width': '100%',
-        #     'height': '60px',
-        #     'lineHeight': '60px',
-        #     'borderWidth': '1px',
-        #     'borderStyle': 'dashed',
-        #     'borderRadius': '5px',
-        #     'textAlign': 'center'
-        # }, id='upload', multiple=False),
-        # html.Div(id="upload-result"),
-        # dbc.Spinner(html.Div(id="loading-output"), color="primary"),
-        # dbc.Collapse(
-        #     dbc.Row(
-        #         [dbc.Col(dbc.Button('进行分析', id='add_graph', color='primary'), width=3),
-        #          dbc.Col(dbc.Button('取消', id='upload_cancel', color='light'), width=3),
-        #          ]
-        #     ), id="upload-buttons", is_open=False
-        # ),
-        # dbc.Label('', id='upload-label')
-        # ,
 
     ], body=True
 )
@@ -182,22 +158,28 @@ view_panel = dbc.Card(
         html.Br(), html.Br(),
         dbc.Label(id="coreness-input-label", children="按coreness筛选节点:"),
         html.Div([
-         dcc.Input(id='coreness-input', type='number', value=0, min=0, max=9, style={'font-size':'10px', } ),
-
-
-])
-
+         dcc.Input(id='coreness-input', type='number', value=0, min=0, max=9, style={'font-size': '10px'})]
+        ),
+        dbc.Label(id="coreness-input-label", children="查看连通分量:"),
+        dcc.Dropdown(
+            id='select_team',
+            options=[{'label': i, 'value': i} for i in
+                     [x for x in range(-1, viewModel.graphs["rail"].get_connected_component_num())]],
+            value=-1,
+            searchable=True,
+            style={'width': '75%'}
+        ),
     ]
 
 )
 
 attack_panel = dbc.Card([html.H5("攻击"),
                          html.Br(), dbc.Row(
-        [dbc.Col(dbc.Button('随机攻击节点', id='random-attack'), width=3.5),
-         dbc.Col(dbc.Button('随机攻击边', id='edge-random-attack', color='danger'), width=3.5),
-         dbc.Col(dbc.Button('意图攻击', id='intentional-attack', color='warning'), width=3.5),
-         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0, style={'margin-left':'25px'}), width=3.5),
-         dbc.Label('已删除', id='ia-label'),
+        [dbc.Col(dbc.Button('随机攻击节点', id='random-attack', color='warning'), width=3.5),
+         dbc.Col(dbc.Button('随机攻击边', id='edge-random-attack'), width=3.5),
+         dbc.Col(dbc.Button('意图攻击节点', id='intentional-attack', color='danger'), width=3.5),
+         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0,
+                            style={'margin-left': '25px'}), width=3.5),
          ]
     )], body=True)
 
@@ -205,12 +187,7 @@ attack_panel = dbc.Card([html.H5("攻击"),
 def Header(name, app):
     title = html.H1(name, style={"margin-top": 3, "text-align": "center","color": "teal",  # 设置字体颜色
     "font-weight": "bold",  # 设置字体粗细
-    "font-family": "Arial, sans-serif"  })
-    # logo = html.Img(
-    #     src=app.get_asset_url("dash-logo.png"), style={"float": "right", "height": 60}
-    # )
-    # link = html.A(logo, href="https://plotly.com/dash/")
-
+    "font-family": "Arial, sans-serif"})
     return dbc.Row([dbc.Col(title, md=12)])
 
 
@@ -236,40 +213,19 @@ app.layout = dbc.Container(
                         stylesheet=[],
                         responsive=True
                     )
-                    ,
-                    dbc.Toast(
-                        id="node_selection_toast",
-                        header="点击以选中结点",
-                        is_open=False,
-                        dismissable=False,
-                        # icon="primary",
-                        children=[html.Div(
-                            [dbc.Row([dbc.Col(dbc.Label(id="ia-selected-label"), width=6),
-                                      dbc.Col(dbc.ButtonGroup(
-                                          [dbc.Button('取消', color='dark', id='ia-cancel'),
-                                           dbc.Button('删除', color='primary', id='ia-delete')]), width=3)
-                                      ]),
-                             dbc.ListGroup(id='selected_nodes')]
-                        )
-                        ],
-                        # top: 66 positions the toast below the navbar
-                        style={"position": "fixed", "top": 256, "left": 360, "width": 220},
-                    )], width=9),
+                    ], width=9),
             ]
         ),
         dbc.Col([
             dbc.Row([dbc.Col(dcc.Graph(id='popular_nodes')),
                      dbc.Col(dcc.Graph(id='coreness_nodes'))
                      ]),
-            dbc.Row([dbc.Col(dcc.Graph(id='degree_distribution')),dbc.Col(dcc.Graph(id='cluster_nodes'))]),
+            dbc.Row([dbc.Col(dcc.Graph(id='degree_distribution')),
+                     dbc.Col(dcc.Graph(id='cluster_nodes'))]),
         ]),
         dbc.Toast(
             id="popover",
             is_open=False,
-            # dismissable=True,
-            # duration=500,
-            # icon="primary",
-            # top: 66 positions the toast below the navbar
             style={"position": "fixed", "bottom": 10, "right": 10, "width": 200},
         ),
         html.Div(id="temp"),
@@ -277,38 +233,13 @@ app.layout = dbc.Container(
     fluid=True,
 )
 
+
 @app.callback(
     Output("degree-slider-label", "children"),
     Input("degree-slider", "value")
 )
 def update_label(degree_range):
     return "按度数筛选节点：{}-{}".format(degree_range[0], degree_range[1])
-
-
-@app.callback(
-    Output('node_selection_toast', 'is_open'),
-    Output("random-attack", "disabled"),
-    Output("intentional-attack", "disabled"),
-    Output("reset", "disabled"),
-    Output("edge-random-attack", "disabled"),
-    Input("ia-label", "children"),
-    Input("intentional-attack", "n_clicks"),
-    Input("ia-cancel", "n_clicks"),
-    Input("reset", "n_clicks"),
-)
-def intentional_attack(x, a, b, d):
-    triggered_id = ctx.triggered_id
-    label = ""
-    if triggered_id == 'reset':
-        viewModel.is_ia = False
-        viewModel.ia_selected = []
-    elif triggered_id == 'intentional-attack':
-        viewModel.is_ia = True
-        viewModel.ia_selected = []
-    elif triggered_id == 'ia-cancel':
-        viewModel.is_ia = False
-        viewModel.ia_selected = []
-    return viewModel.is_ia, viewModel.is_ia, viewModel.is_ia, label,viewModel.is_ia
 
 
 @app.callback(
@@ -322,37 +253,46 @@ def intentional_attack(x, a, b, d):
     Output("coreness_nodes", "figure"),
     Output("degree_distribution", "figure"),
     Output("cluster_nodes", "figure"),
-    Output('ia-label', 'children'),
     Output("total_node", "children"),
     Output("total_edge", "children"),
     Output("diameter", "children"),
+    Output("select_team", "children"),
 
     Input("window-dropdown", "value"),
     Input("degree-slider", "value"),
     Input("coreness-input", "value"),
+    Input("select_team", "value"),
     Input('random-attack', 'n_clicks'),
-    Input('ia-delete', 'n_clicks'),
+    Input("intentional-attack", "n_clicks"),
     Input('reset', 'n_clicks'),
     Input('edge-random-attack', 'n_clicks')
 )
-def update_figure(book, degree_range, coreness_input, random_attack_click, reset_click, ia_label,edge_attack):
+def update_figure(book, degree_range, coreness_input, component,
+                  random_attack, intentional_attack, reset_click, edge_attack):
     triggered_id = ctx.triggered_id
     graph = viewModel.get_graph(book, triggered_id == 'reset')
     if triggered_id == 'random-attack':
         nodes = random.sample(list(graph.nodes), int(len(graph.nodes) * 0.3))
         graph.remove_nodes([node.id for node in nodes])
+        graph.calculate_all_properties()
     if triggered_id == 'edge-random-attack':
         edges = random.sample(list(graph.edges.keys()), int(len(graph.edges) * 0.3))
         graph.remove_edges([edge for edge in edges])
+        graph.calculate_all_properties()
     if triggered_id == "intentional-attack":
         nodes_dict = dict(sorted(graph.degrees.items(), key=itemgetter(1), reverse=True))
         nodes = list(nodes_dict.keys())[:int(len(graph.nodes) * 0.3)]
         graph.remove_nodes([node.id for node in nodes])
-    if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
-        graph.remove_nodes(viewModel.ia_selected)
-        viewModel.ia_selected = []
-        viewModel.is_ia = False
-    ss, e, present_node_num, present_edge_num = graph_to_view(graph, degree_range, coreness_input)
+        graph.calculate_all_properties()
+    if coreness_input != 0:
+        nodes_dict = {key: value for key, value in graph.degrees.items() if value < coreness_input}
+        nodes = list(nodes_dict.keys())
+        while nodes:
+            graph.remove_nodes([node.id for node in nodes])
+            nodes_dict = {key: value for key, value in graph.degrees.items() if value < coreness_input}
+            nodes = list(nodes_dict.keys())
+        graph.calculate_all_properties()
+    ss, e, present_node_num, present_edge_num = graph_to_view(graph, degree_range, coreness_input, component)
     cn = graph.get_low_cluster_nodes()
     cluster = go.Figure(
         data=[go.Bar(x=[n.name for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
@@ -382,17 +322,14 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
         )
 
     diameter = graph.diameter
-    # return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
-    #     graph.get_average_degree()), "{:.2f}".format(
-    #     graph.get_average_path_length()), "{:.2f}".format(
-    #     graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-    #        nodes_cate, popular, coreness, degree_dis,cluster, ""
 
-    return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
+    return (e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
         graph.get_average_degree()), "{:.2f}".format(
         graph.get_average_path_length()), "{:.2f}".format(
-        graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-        popular, coreness, degree_dis, cluster, "", present_node_num,present_edge_num,diameter
+        graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()),
+        popular, coreness, degree_dis, cluster, present_node_num, present_edge_num, diameter,
+        graph.get_connected_component_num()
+    )
 
 
 @app.callback(
@@ -410,7 +347,6 @@ def update_style(book, degree_range):
     Input("layout-radio", "value")
 )
 def update_layout(type):
-    print(type)
     layout = {}
     if type == 'cose':
         layout = {
@@ -433,21 +369,6 @@ def update_layout(type):
         }
     layout["name"] = type
     return layout
-
-
-@app.callback(Output('selected_nodes', 'children'),
-              Output("ia-selected-label", "children"),
-              Input('cytoscape', 'selectedNodeData'))
-def display_selection(data_list):
-    label = "未选择结点"
-    if data_list is None or not viewModel.is_ia:
-        return [], label
-    cities_list = [dbc.ListGroupItem(data['label'], color="info") for data in data_list]
-    viewModel.ia_selected = [data['label'] for data in data_list]
-
-    if len(cities_list) > 0:
-        label = "选中{}个结点".format(len(cities_list))
-    return cities_list, label
 
 
 @app.callback(Output('popover', 'is_open'),
@@ -541,86 +462,3 @@ def parse_contents(contents, filename):
             'wordBreak': 'break-all'
         })
     ])
-
-# @app.callback(
-#     Output("cytoscape", "elements"),
-#     Output("connected_component_num", "children"),
-#     Output("avg_degree", "children"),
-#     Output("avg_path_len", "children"),
-#     Output("cluster_co", "children"),
-#     Output("coreness", "children"),
-#     Output("popular_nodes", "figure"),
-#     Output("coreness_nodes", "figure"),
-#     Output("degree_distribution", "figure"),
-#     Output("cluster_nodes", "figure"),
-#     Output('ia-label', 'children'),
-#     Output("total_node", "children"),
-#     Output("total_edge", "children"),
-#     Output("diameter", "children"),
-#
-#     Input("window-dropdown", "value"),
-#     # Input("degree-slider", "value"),
-#     # Input("coreness-input", "value"),
-#     Input("if_only_show_connected"),
-#     Input('reset', 'n_clicks'),
-#
-# )
-# def show_connected_cluster(book, degree_range, coreness_input, random_attack_click, reset_click, ia_label,edge_attack):
-#     triggered_id = ctx.triggered_id
-#     graph = viewModel.get_graph(book, triggered_id == 'reset')
-#     if triggered_id == 'random-attack':
-#         nodes = random.sample(list(graph.nodes), int(len(graph.nodes) * 0.3))
-#         graph.remove_nodes([node.id for node in nodes])
-#     if triggered_id == 'edge-random-attack':
-#         edges = random.sample(list(graph.edges.keys()), int(len(graph.edges) * 0.3))
-#         graph.remove_edges([edge for edge in edges])
-#     if triggered_id == "intentional-attack":
-#         nodes_dict = dict(sorted(graph.degrees.items(), key=itemgetter(1), reverse=True))
-#         nodes = list(nodes_dict.keys())[:int(len(graph.nodes) * 0.3)]
-#         graph.remove_nodes([node.id for node in nodes])
-#     if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
-#         graph.remove_nodes(viewModel.ia_selected)
-#         viewModel.ia_selected = []
-#         viewModel.is_ia = False
-#     ss, e, present_node_num, present_edge_num = graph_to_view(graph, degree_range, coreness_input)
-#     cn = graph.get_low_cluster_nodes()
-#     cluster = go.Figure(
-#         data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
-#         layout_title_text="聚类系数"
-#     )
-#     dd = graph.get_degree_distribution()
-#     degree_dis = go.Figure(
-#         data=[go.Bar(x=list(dd.keys()), y=list(dd.values()))],
-#         layout_title_text="度数分布"
-#     )
-#     pn = graph.get_popular_nodes()
-#     popular = go.Figure(
-#         data=[go.Bar(x=[n.id for n, _ in pn], y=[degree for _, degree in pn], marker={'color': '#03fc24'})],
-#         layout_title_text="结点度数"
-#     )
-#
-#     con = graph.get_high_coreness_nodes()
-#     coreness = go.Figure(
-#         data=[go.Bar(x=[n.id for n, _ in con], y=[degree for _, degree in con],marker={'color': '#a103fc'})],
-#         layout_title_text="Coreness"
-#     )
-#
-#     nodes_cate = []
-#     for k, v in graph.get_node_color_map().items():
-#         nodes_cate.append(
-#             dbc.Badge(k, color=v, pill=True, className="me-1", style={"margin": "4 4 4 4"}, text_color="white")
-#         )
-#     total_node =len(graph.nodes)
-#     total_edge =len(graph.edges)
-#     diameter = graph.diameter
-#     # return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
-#     #     graph.get_average_degree()), "{:.2f}".format(
-#     #     graph.get_average_path_length()), "{:.2f}".format(
-#     #     graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-#     #        nodes_cate, popular, coreness, degree_dis,cluster, ""
-#
-#     return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
-#         graph.get_average_degree()), "{:.2f}".format(
-#         graph.get_average_path_length()), "{:.2f}".format(
-#         graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-#         popular, coreness, degree_dis, cluster, "", present_node_num,present_edge_num,diameter
