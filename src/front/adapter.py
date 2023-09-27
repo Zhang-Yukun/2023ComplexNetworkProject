@@ -8,7 +8,7 @@ def graph_to_view(graph, degree_range=None):
     for node in graph.nodes:
         if degree_range[1] >= node.get_degree() >= degree_range[0]:
             elements.append(
-                {"data": {"id": str(node.id), "label": node.id, 'class_name': node.id}, })
+                {"data": {"id": str(node.id), "label": node.id, 'class_name': node.id, 'node_degree': 500*((float(node.get_degree())-0.9)/56)}})
     for fe, tes in graph.edges.items():
         fen = graph.id_to_node[fe[0]]
         ten = graph.id_to_node[fe[1]]
@@ -21,7 +21,9 @@ def graph_to_view(graph, degree_range=None):
     ss = [
         {'selector': 'node',
          'style': {
-             'label': 'data(label)'
+             'label': 'data(label)',
+             'width': 'data(node_degree)',  # 根据节点的degree标签设置节点大小
+             'height': 'data(node_degree)'  # 根据节点的degree标签设置节点大小
          }},
         {'selector': 'edge',
          'style': {
@@ -31,10 +33,12 @@ def graph_to_view(graph, degree_range=None):
          }}]
 
     for fn, cl in graph.get_node_color_map().items():
+
         ss.append(
             {'selector': '[class_name *= "{}"]'.format(fn),
              'style': {
-                 'background-color': '{}'.format(cl)
+                 'background-color': '{}'.format(cl),
+
              }}
         )
         ss.append({'selector': '[dom_class_name *= "{}"]'.format(fn),
