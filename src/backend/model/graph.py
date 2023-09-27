@@ -91,7 +91,7 @@ class Graph:
 
     def calculate_distances(self):
         """
-        计算任意两个节点之间的距离
+        计算任意两个结点之间的距离
         """
         distances = {}
         for node in tqdm.tqdm(self.nodes):
@@ -145,7 +145,7 @@ class Graph:
 
     def calculate_cluster_coefficient(self):
         """
-        计算每个节点的聚类系数
+        计算每个结点的聚类系数
         """
         for node in tqdm.tqdm(self.nodes):
             degree = node.get_degree()
@@ -325,8 +325,8 @@ class Graph:
 #                 if nid.id in self.edges:
 #
 #                     names = nid.neighbours.keys()
-#                     for item in names:  # 删节点的neibour
-#                         self.id2nodes[item].prevs.pop(nid.id)  # 删neibour节点的prev
+#                     for item in names:  # 删结点的neibour
+#                         self.id2nodes[item].prevs.pop(nid.id)  # 删neibour结点的prev
 #                     self.id2nodes[nid.id].neighbours = {}
 #                     self.edges.pop(nid.id)  # 删edge
 #
@@ -347,7 +347,7 @@ class Graph:
 #
 #     def calc_dists(self):
 #         """
-#         计算任意两个节点之间的距离
+#         计算任意两个结点之间的距离
 #         """
 #         dists = {}
 #         for n in tqdm.tqdm(self.nodes):
@@ -385,7 +385,7 @@ class Graph:
 #
 #     def calc_cluster_coefficient(self):
 #         """
-#         计算每个节点的聚类系数
+#         计算每个结点的聚类系数
 #         """
 #         for node in tqdm.tqdm(self.nodes):
 #             e = node.get_degree()

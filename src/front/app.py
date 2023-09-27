@@ -167,7 +167,7 @@ view_panel = dbc.Card(
             inline=True
         ),
         html.Br(), html.Br(),
-        dbc.Label(id="degree-slider-label", children="按度数筛选节点:"),
+        dbc.Label(id="degree-slider-label", children="按度数筛选结点:"),
         dcc.RangeSlider(
             id="degree-slider",
             min=0,
