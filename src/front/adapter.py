@@ -7,22 +7,30 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0):
     elements = []
     for node in graph.nodes:
         its_coreness = graph.coreness[node]
-        if degree_range[1] >= node.get_degree() >= degree_range[0] and its_coreness>=coreness_low_bound:
+        if degree_range[1] >= node.get_degree() >= degree_range[0] and its_coreness >= coreness_low_bound:
             elements.append(
                 {"data": {"id": str(node.id), "label": node.id, 'class_name': node.id,
-                          'node_degree': 500*((float(node.get_degree())-0.9)/56)},
+                          'node_degree': 500 * ((float(node.get_degree()) - 0.9) / 56)},
                  "position": {"x": 20 * float(node.longitude), "y": -20 * float(node.latitude)}})
+
+    present_node_num = len(elements)
+
     for fe, tes in graph.edges.items():
         fen = graph.id_to_node[fe[0]]
         ten = graph.id_to_node[fe[1]]
         fen_coreness = graph.coreness[fen]
         ten_coreness = graph.coreness[ten]
-        if ( fen_coreness<coreness_low_bound or ten_coreness<coreness_low_bound or degree_range[1] < fen.get_degree() or fen.get_degree() < degree_range[0]
+        if (fen_coreness < coreness_low_bound or ten_coreness < coreness_low_bound or degree_range[
+            1] < fen.get_degree() or fen.get_degree() < degree_range[0]
                 or degree_range[1] < ten.get_degree() or ten.get_degree() < degree_range[0]):
             continue
         dom = fen if fen.get_degree() > ten.get_degree() else ten
         elements.append({"data": {"source": str(fe[0]), "target": str(fe[1]), "weight": tes,
+                                  "lineWidth": 500 * ((float(tes)) / graph.diameter),
                                   "dom_class_name": dom.id}})
+
+    present_edge_num = len(elements) - present_node_num
+
     ss = [
         {'selector': 'node',
          'style': {
@@ -34,12 +42,11 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0):
         {'selector': 'edge',
          'style': {
              "curve-style": "bezier",
-             'width': "2px",
-             'line-opacity': "50%"
+             'width': 'data(lineWidth)',
+             'line-opacity': "60%"
          }}]
 
     for fn, cl in graph.get_node_color_map().items():
-
         ss.append(
             {'selector': '[class_name *= "{}"]'.format(fn),
              'style': {
@@ -51,4 +58,5 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0):
                    'style': {
                        'line-color': '{}'.format(cl),
                    }})
-    return ss, elements
+
+    return ss, elements, present_node_num, present_edge_num

@@ -56,8 +56,7 @@ cards = [
             html.P("连通分量数", className="card-text"),
         ],
         body=True,
-        inverse=True,
-        color="primary",
+        color="light",
     ),
     dbc.Card(
         [
@@ -348,7 +347,7 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
         graph.remove_nodes(viewModel.ia_selected)
         viewModel.ia_selected = []
         viewModel.is_ia = False
-    ss, e = graph_to_view(graph, degree_range, coreness_input)
+    ss, e, present_node_num, present_edge_num = graph_to_view(graph, degree_range, coreness_input)
     cn = graph.get_low_cluster_nodes()
     cluster = go.Figure(
         data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
@@ -389,7 +388,7 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
         graph.get_average_degree()), "{:.2f}".format(
         graph.get_average_path_length()), "{:.2f}".format(
         graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-        popular, coreness, degree_dis, cluster, "", total_node,total_edge,diameter
+        popular, coreness, degree_dis, cluster, "", present_node_num,present_edge_num,diameter
 
 
 @app.callback(
@@ -398,7 +397,7 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
     Input("degree-slider", "value")
 )
 def update_style(book, degree_range):
-    ss, e = graph_to_view(viewModel.get_graph(book, False), degree_range)
+    ss = graph_to_view(viewModel.get_graph(book, False), degree_range)[0]
     return ss
 
 
