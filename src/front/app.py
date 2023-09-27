@@ -205,7 +205,7 @@ app.layout = dbc.Container(
                     cyto.Cytoscape(
                         id='cytoscape',
                         elements=[],
-                        layout={'name': 'concentric'},
+                        layout={'name': 'preset'},
                         style={'width': '100%', 'height': '1000px'},
                         stylesheet=[],
                         responsive=True
@@ -305,34 +305,22 @@ def intentional_attack(x, a, b, d):
     Input('reset', 'n_clicks'),
     Input('edge-random-attack', 'n_clicks')
 )
-def update_figure(book, degree_range,coreness_input, random_attack_click, reset_click, ia_label,edge_attack):
+def update_figure(book, degree_range, coreness_input, random_attack_click, reset_click, ia_label,edge_attack):
     triggered_id = ctx.triggered_id
     graph = viewModel.get_graph(book, triggered_id == 'reset')
     if triggered_id == 'random-attack':
-        nodes = random.sample(graph.nodes, int(len(graph.nodes) * 0.3))
-        print("====-----====")
+        nodes = random.sample(list(graph.nodes), int(len(graph.nodes) * 0.3))
         graph.remove_nodes([node.id for node in nodes])
-        graph.calc_cluster_coefficient()
-        graph.calc_coreness()
-        # graph.calc_dists()
-        graph.calc_connected_components_num()
-
-
+        graph.calculate_all_properties()
     if triggered_id == 'edge-random-attack':
-        nodes = random.sample(graph.nodes, int(len(graph.nodes) * 0.3))
-        graph.remove_edge(nodes)
-        graph.calc_connected_components_num()
-        graph.calc_cluster_coefficient()
-        graph.calc_coreness()
-
-
+        edges = random.sample(list(graph.edges.keys()), int(len(graph.edges) * 0.3))
+        graph.remove_edges([edge for edge in edges])
+        graph.calculate_all_properties()
     if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
         graph.remove_nodes(viewModel.ia_selected)
         viewModel.ia_selected = []
         viewModel.is_ia = False
-        graph.calc_connected_components_num()
-        graph.calc_cluster_coefficient()
-        graph.calc_coreness()
+        graph.calculate_all_properties()
     ss, e = graph_to_view(graph, degree_range)
     cn = graph.get_low_cluster_nodes()
     cluster = go.Figure(

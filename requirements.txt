@@ -12,3 +12,4 @@ psutil
 numpy
 plotly
 tqdm
+proj

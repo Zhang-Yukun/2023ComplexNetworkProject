@@ -8,7 +8,10 @@ def graph_to_view(graph, degree_range=None):
     for node in graph.nodes:
         if degree_range[1] >= node.get_degree() >= degree_range[0]:
             elements.append(
-                {"data": {"id": str(node.id), "label": node.id, 'class_name': node.id, 'node_degree': 500*((float(node.get_degree())-0.9)/56)}})
+                {"data": {"id": str(node.id), "label": node.id, 'class_name': node.id,
+                          'node_degree': 500*((float(node.get_degree())-0.9)/56)},
+                 "position": {"x": float(node.longitude), "y": float(node.latitude)}})
+    print(elements)
     for fe, tes in graph.edges.items():
         fen = graph.id_to_node[fe[0]]
         ten = graph.id_to_node[fe[1]]
