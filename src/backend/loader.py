@@ -41,22 +41,22 @@ def load_graph(clz, label):
     for index, row in df.iterrows():
         g.add_edge(row["start_station_name"], row["end_station_name"], float(row["running_time"]))
     print('calculating properties for {}'.format(label))
-    g.calculate_distances()
-    g.calculate_coreness()
-    g.calculate_cluster_coefficient()
-    g.calculate_diameter()
-    g.calculate_connected_components_num()
+    g.calculate_all_properties()
     print('calculation properties for {} done'.format(label))
     if not os.path.exists(base_path + "cache/"):
         os.makedirs(base_path + "cache/")
     pickle.dump(g, open(base_path + "cache/{}.pkl".format(label), "wb"))
     return g
 
+
 class RailGraph(Graph):
     def get_node_class(self, node):
         return node.label[0]
+
+
 def load_rail_graph() -> object:
     return load_graph(RailGraph, "graph")
+
 
 def load_any_graph(key) -> object:
     return load_graph(Graph, key)
