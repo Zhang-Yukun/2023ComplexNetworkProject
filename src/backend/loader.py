@@ -34,12 +34,12 @@ def load_graph(clz, label):
         return pickle.load(open(base_path + "/cache/{}.pkl".format(label), 'rb'))
     # if not path.exists('backend/data/parsed/{}/names.txt'.format(label)):
     #     generate_novel_graph(label)
-    df = pd.read_csv(base_path + "station_coordinate.csv")
+    df = pd.read_csv(base_path + "node_id.csv")
     for index, row in df.iterrows():
-        g.add_node(Node(index=row["station"], name=row["station"], longitude=row["longitude"], latitude=row["latitude"]))
-    df = pd.read_csv(base_path + "edge_simple.csv")
+        g.add_node(Node(index=str(row["id"]), name=row["station"], longitude=row["longitude"], latitude=row["latitude"]))
+    df = pd.read_csv(base_path + "edge_simple_id.csv")
     for index, row in df.iterrows():
-        g.add_edge(row["start_station_name"], row["end_station_name"], float(row["running_time"]))
+        g.add_edge(str(row["start_station_id"]), str(row["end_station_id"]), float(row["running_time"]))
     print('calculating properties for {}'.format(label))
     g.calculate_all_properties()
     print('calculation properties for {} done'.format(label))

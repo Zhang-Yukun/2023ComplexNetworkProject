@@ -16,6 +16,7 @@ from dash.long_callback import DiskcacheManager
 import src.utils.config
 from src.front.adapter import graph_to_view
 from src.front.view_model import ViewModel
+from operator import itemgetter
 
 external_stylesheets = [
     "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css",
@@ -162,7 +163,7 @@ view_panel = dbc.Card(
                 "display": "inline-block",
                 "margin": "2px",
             },
-            value="concentric",
+            value="preset",
             inline=True
         ),
         html.Br(), html.Br(),
@@ -181,7 +182,7 @@ view_panel = dbc.Card(
         html.Br(), html.Br(),
         dbc.Label(id="coreness-input-label", children="按coreness筛选节点:"),
         html.Div([
-         dcc.Input(id='coreness-input', type='number', value=0, min=0,max=8, style={'font-size':'10px', } ),
+         dcc.Input(id='coreness-input', type='number', value=0, min=0, max=9, style={'font-size':'10px', } ),
 
 
 ])
@@ -230,7 +231,7 @@ app.layout = dbc.Container(
                     cyto.Cytoscape(
                         id='cytoscape',
                         elements=[],
-                        layout={'name': 'concentric'},
+                        layout={'name': 'preset'},
                         style={'width': '100%', 'height': '1000px'},
                         stylesheet=[],
                         responsive=True
@@ -343,6 +344,10 @@ def update_figure(book, degree_range, coreness_input, random_attack_click, reset
     if triggered_id == 'edge-random-attack':
         edges = random.sample(list(graph.edges.keys()), int(len(graph.edges) * 0.3))
         graph.remove_edges([edge for edge in edges])
+    if triggered_id == "intentional-attack":
+        nodes_dict = dict(sorted(graph.degrees.items(), key=itemgetter(1), reverse=True))
+        nodes = list(nodes_dict.keys())[:int(len(graph.nodes) * 0.3)]
+        graph.remove_nodes([node.id for node in nodes])
     if triggered_id == 'ia-delete' and len(viewModel.ia_selected) > 0:
         graph.remove_nodes(viewModel.ia_selected)
         viewModel.ia_selected = []
@@ -406,6 +411,7 @@ def update_style(book, degree_range):
     Input("layout-radio", "value")
 )
 def update_layout(type):
+    print(type)
     layout = {}
     if type == 'cose':
         layout = {
@@ -456,7 +462,7 @@ def display_hover_node(data):
         node = graph.id_to_node[node_id]
         content = [
             dbc.ListGroupItem([html.Label("{}".format(data['label']), style={"color": "white"})],
-                              color=graph.get_node_color_map()[data['class_name']]),
+                              color=graph.get_node_color_map()[data['id']]),
             dbc.ListGroupItem("度数：{}".format(node.get_degree()))
         ]
         if node in graph.cluster_coefficient.keys():

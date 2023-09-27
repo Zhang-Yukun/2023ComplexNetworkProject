@@ -9,12 +9,10 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0):
         its_coreness = graph.coreness[node]
         if degree_range[1] >= node.get_degree() >= degree_range[0] and its_coreness >= coreness_low_bound:
             elements.append(
-                {"data": {"id": str(node.id), "label": node.id, 'class_name': node.id,
-                          'node_degree': 500 * ((float(node.get_degree()) - 0.9) / 56)},
-                 "position": {"x": 20 * float(node.longitude), "y": -20 * float(node.latitude)}})
-
+                {"data": {"id": str(node.id), "label": node.name, 'class_name': node.name,
+                          'node_degree': 500*((float(node.get_degree())-0.9)/56)},
+                 "position": {"x": 800 * float(node.longitude), "y": -1400 * float(node.latitude)}})
     present_node_num = len(elements)
-
     for fe, tes in graph.edges.items():
         fen = graph.id_to_node[fe[0]]
         ten = graph.id_to_node[fe[1]]
@@ -48,7 +46,7 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0):
 
     for fn, cl in graph.get_node_color_map().items():
         ss.append(
-            {'selector': '[class_name *= "{}"]'.format(fn),
+            {'selector': '[id *= "{}"]'.format(fn),
              'style': {
                  'background-color': '{}'.format(cl),
 
