@@ -151,7 +151,15 @@ view_panel = dbc.Card(
                 str(int(x)): str(int(x))
                 for x in np.linspace(0, 500, 5)
             },
-        )
+        ),
+        html.Br(), html.Br(),
+        dbc.Label(id="coreness-input-label", children="按coreness筛选节点:"),
+        html.Div([
+         dcc.Input(id='coreness-input', type='number', value=0, min=0),
+
+         html.Div(id='output')
+])
+
     ]
 
 )
@@ -180,7 +188,7 @@ def Header(name, app):
 
 
 app.layout = dbc.Container(
-
+    style={'backgroundColor': '#f0f8ff'},  # 设置背景颜色为淡蓝色
     children= [
         Header("中国铁路公交网络", app),
         html.Hr(),
@@ -319,12 +327,13 @@ def intentional_attack(x, a, b, d):
     Output('ia-label', 'children'),
     Input("window-dropdown", "value"),
     Input("degree-slider", "value"),
+    Input("coreness-input", "value"),
     Input('random-attack', 'n_clicks'),
     Input('ia-delete', 'n_clicks'),
     Input('reset', 'n_clicks'),
     Input('edge-random-attack', 'n_clicks')
 )
-def update_figure(book, degree_range, random_attack_click, reset_click, ia_label,edge_attack):
+def update_figure(book, degree_range,coreness_input, random_attack_click, reset_click, ia_label,edge_attack):
     triggered_id = ctx.triggered_id
     graph = viewModel.get_graph(book, triggered_id == 'reset')
     if triggered_id == 'random-attack':
@@ -332,7 +341,7 @@ def update_figure(book, degree_range, random_attack_click, reset_click, ia_label
         graph.remove_nodes([node.id for node in nodes])
         graph.calc_cluster_coefficient()
         graph.calc_coreness()
-        graph.calc_dists()
+        # graph.calc_dists()
         graph.calc_connected_components_num()
 
 
