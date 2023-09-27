@@ -34,6 +34,24 @@ viewModel = ViewModel()
 cards = [
     dbc.Card(
         [
+            html.H3("0", className="card-title", id="total_node"),
+            html.P("结点数", className="card-text"),
+        ],
+        body=True,
+        inverse=True,
+        color="primary",
+    ),
+    dbc.Card(
+        [
+            html.H3("0", className="card-title", id="total_edge"),
+            html.P("边数", className="card-text"),
+        ],
+        body=True,
+        inverse=True,
+        color="primary",
+    ),
+    dbc.Card(
+        [
             html.H3("0", className="card-title", id="connected_component_num"),
             html.P("连通分量数", className="card-text"),
         ],
@@ -48,7 +66,16 @@ cards = [
         ],
         body=True,
         color="light",
-    ), dbc.Card(
+    ),
+    dbc.Card(
+        [
+            html.H3(f"{0:.2f}", className="card-title", id="diameter"),
+            html.P("网络直径", className="card-text"),
+        ],
+        body=True,
+        color="light",
+    ),
+    dbc.Card(
         [
             html.H3(f"{0:.2f}", className="card-title", id="avg_path_len"),
             html.P("平均路径长度", className="card-text"),
@@ -129,9 +156,8 @@ view_panel = dbc.Card(
                 {"label": "中心", "value": "concentric"},
                 {"label": "环状", "value": "circle"},
                 {"label": "宽度", "value": "breadthfirst"},
-                # {"label": "随机", "value": "random"},
                 {"label": "网格", "value": "grid"},
-                {"label": "地图", "value": "preset"}
+                # {"label": "地图", "value": "preset"}
             ],
             labelStyle={
                 "display": "inline-block",
@@ -145,20 +171,20 @@ view_panel = dbc.Card(
         dcc.RangeSlider(
             id="degree-slider",
             min=0,
-            max=400,
-            value=[0, 500],
+            max=70,
+            value=[0, 60],
             step=5,
             marks={
                 str(int(x)): str(int(x))
-                for x in np.linspace(0, 500, 5)
+                for x in np.linspace(0, 60, 5)
             },
         ),
         html.Br(), html.Br(),
         dbc.Label(id="coreness-input-label", children="按coreness筛选节点:"),
         html.Div([
-         dcc.Input(id='coreness-input', type='number', value=0, min=0),
+         dcc.Input(id='coreness-input', type='number', value=0, min=0,max=8, style={'font-size':'10px', } ),
 
-         html.Div(id='output')
+
 ])
 
     ]
@@ -170,7 +196,7 @@ attack_panel = dbc.Card([html.H5("攻击"),
         [dbc.Col(dbc.Button('随机攻击节点', id='random-attack'), width=3.5),
          dbc.Col(dbc.Button('随机攻击边', id='edge-random-attack', color='danger'), width=3.5),
          dbc.Col(dbc.Button('意图攻击', id='intentional-attack', color='warning'), width=3.5),
-         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0), width=3.5),
+         dbc.Col(dbc.Button('复原', id='reset', color='success', n_clicks=0, style={'margin-left':'25px'}), width=3.5),
          dbc.Label('已删除', id='ia-label'),
          ]
     )], body=True)
@@ -196,7 +222,7 @@ app.layout = dbc.Container(
         dbc.Row(
             [
                 dbc.Col(
-                    [panel, view_panel, attack_panel], width=3,
+                    [panel, view_panel, attack_panel], width=2,
                 ),
                 dbc.Col([
                     dbc.Row(
@@ -297,6 +323,10 @@ def intentional_attack(x, a, b, d):
     Output("degree_distribution", "figure"),
     Output("cluster_nodes", "figure"),
     Output('ia-label', 'children'),
+    Output("total_node", "children"),
+    Output("total_edge", "children"),
+    Output("diameter", "children"),
+
     Input("window-dropdown", "value"),
     Input("degree-slider", "value"),
     Input("coreness-input", "value"),
@@ -333,7 +363,7 @@ def update_figure(book, degree_range,coreness_input, random_attack_click, reset_
         graph.calc_connected_components_num()
         graph.calc_cluster_coefficient()
         graph.calc_coreness()
-    ss, e = graph_to_view(graph, degree_range)
+    ss, e = graph_to_view(graph, degree_range,coreness_input)
     cn = graph.get_low_cluster_nodes()
     cluster = go.Figure(
         data=[go.Bar(x=[n.id for n, _ in cn], y=[ce for _, ce in cn],marker={'color': 'red'})],
@@ -361,8 +391,9 @@ def update_figure(book, degree_range,coreness_input, random_attack_click, reset_
         nodes_cate.append(
             dbc.Badge(k, color=v, pill=True, className="me-1", style={"margin": "4 4 4 4"}, text_color="white")
         )
-
-
+    total_node =len(graph.nodes)
+    total_edge =len(graph.edges)
+    diameter = graph.diameter
     # return e, "{}".format(graph.get_connected_component_num()), "{:.2f}".format(
     #     graph.get_average_degree()), "{:.2f}".format(
     #     graph.get_average_path_length()), "{:.2f}".format(
@@ -373,7 +404,7 @@ def update_figure(book, degree_range,coreness_input, random_attack_click, reset_
         graph.get_average_degree()), "{:.2f}".format(
         graph.get_average_path_length()), "{:.2f}".format(
         graph.get_cluster_coefficient()), "{:.2f}".format(graph.get_coreness()), \
-        popular, coreness, degree_dis, cluster, ""
+        popular, coreness, degree_dis, cluster, "", total_node,total_edge,diameter
 
 
 @app.callback(
