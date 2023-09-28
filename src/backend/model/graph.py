@@ -71,6 +71,12 @@ class Graph:
             target_node = self.id_to_node[edge[1]]
             source_node.neighbours.pop(edge[1])
             target_node.neighbours.pop(edge[0])
+            self.degrees[source_node] -= 1
+            self.degrees[target_node] -= 1
+            if self.degrees[source_node] == 0:
+                self.remove_nodes([edge[0]])
+            if self.degrees[target_node] == 0:
+                self.remove_nodes([edge[1]])
 
     # 基本参数的计算
     def calculate_all_properties(self):
@@ -91,7 +97,8 @@ class Graph:
         return self.degrees
 
     def calculate_average_degree(self):
-        self.average_degree = np.average([x for x in self.degrees.values()])
+        if self.degrees:
+            self.average_degree = np.average([x for x in self.degrees.values()])
 
     def get_average_degree(self):
         return self.average_degree
@@ -162,7 +169,8 @@ class Graph:
             if y != math.inf and y != 0:
                 cnt += 1
                 avg += y
-        self.average_path_length = avg / cnt
+        if avg != 0 and cnt != 0:
+            self.average_path_length = avg / cnt
 
     def get_average_path_length(self):
         return self.average_path_length
@@ -227,7 +235,9 @@ class Graph:
         self.cluster_coefficient = cluster_coefficient
 
     def get_cluster_coefficient(self):
-        return np.average([x for x in self.cluster_coefficient.values()])
+        if np.sum([x for x in self.cluster_coefficient.values()]) != 0:
+            return np.average([x for x in self.cluster_coefficient.values()])
+        return 0
 
     def calculate_coreness(self):
         """

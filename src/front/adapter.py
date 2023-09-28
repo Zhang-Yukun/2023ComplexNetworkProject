@@ -11,7 +11,7 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0, component=-1):
                 elements.append(
                     {"data": {"id": str(node.id), "label": node.name, 'class_name': node.name,
                               'node_degree': 500 * ((float(node.get_degree()) - 0.9) / 56)},
-                     "position": {"x": 800 * float(node.longitude), "y": -1400 * float(node.latitude)}})
+                     "position": {"x": 500 * float(node.longitude), "y": -600 * float(node.latitude)}})
         present_node_num = len(elements)
         for fe, tes in graph.edges.items():
             fen = graph.id_to_node[fe[0]]
@@ -46,7 +46,7 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0, component=-1):
         {'selector': 'node',
          'style': {
              'label': 'data(label)',
-             'font-size': '50px',
+             'font-size': '20px',
              'width': 'data(node_degree)',  # 根据节点的degree标签设置节点大小
              'height': 'data(node_degree)'  # 根据节点的degree标签设置节点大小
          }},
