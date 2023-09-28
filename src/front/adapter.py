@@ -27,14 +27,28 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0, component=-1):
                               'node_degree': 200 if 800 * degree < 200 else 800 * degree},
                      "position": {"x": 500 * float(node.longitude), "y": -600 * float(node.latitude)}})
         present_node_num = len(elements)
+        print("-------------------------------------------")
+        print(elements)
+        print(len(elements))
         for fe, tes in graph.edges.items():
             fen = graph.id_to_node[fe[0]]
             ten = graph.id_to_node[fe[1]]
+            fen_coreness = graph.coreness[fen]
+            ten_coreness = graph.coreness[ten]
+            if (fen_coreness < coreness_low_bound or ten_coreness < coreness_low_bound or degree_range[
+                1] < fen.get_degree() or fen.get_degree() < degree_range[0]
+                    or degree_range[1] < ten.get_degree() or ten.get_degree() < degree_range[0]):
+                continue
             dom = fen if fen.get_degree() > ten.get_degree() else ten
             elements.append({"data": {"source": str(fe[0]), "target": str(fe[1]), "weight": tes,
                                       "lineWidth": 100 * ((float(tes)) / max_weight),
                                       "dom_class_name": dom.id}})
         present_edge_num = len(elements) - present_node_num
+        print("***************************************")
+        print("边数")
+        print(present_edge_num)
+        print("e数量")
+        print(len(elements))
     else:
         if component in graph.connected_components_set.keys():
             for node in graph.connected_components_set[component]:
