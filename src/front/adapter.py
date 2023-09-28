@@ -24,7 +24,7 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0, component=-1):
                 elements.append(
                     {"data": {"id": str(node.id), "label": node.name, 'class_name': node.name,
                               'font_size': str(50 if 200 * degree < 50 else 200 * degree) + "px",
-                              'node_degree': 200 if 500 * degree < 200 else 500 * degree},
+                              'node_degree': 200 if 800 * degree < 200 else 800 * degree},
                      "position": {"x": 500 * float(node.longitude), "y": -600 * float(node.latitude)}})
         present_node_num = len(elements)
         for fe, tes in graph.edges.items():
@@ -43,7 +43,7 @@ def graph_to_view(graph, degree_range=None, coreness_low_bound=0, component=-1):
                     elements.append(
                         {"data": {"id": str(node.id), "label": node.name, 'class_name': node.name,
                                   'font_size': str(50 if 200 * degree < 50 else 200 * degree) + "px",
-                                  'node_degree': 200 if 500 * degree < 100 else 200 * degree},
+                                  'node_degree': 200 if 800 * degree < 100 else 800 * degree},
                          "position": {"x": 800 * float(node.longitude), "y": -1400 * float(node.latitude)}})
             present_node_num = len(elements)
             for fe, tes in graph.edges.items():
